@@ -1,163 +1,114 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
-import { generateShapes, checkShapeMatch, calculateScore, getShapeDescription } from './logic';
+import GameLayout from '../../components/GameLayout';
 import './ShapeSorter.css';
 
 const ShapeSorter = () => {
-  const [gameState, setGameState] = useState('idle'); // idle, instructions, playing, paused, finished
-  const [shapes, setShapes] = useState([]);
-  const [targetShape, setTargetShape] = useState(null);
+  const [gameState, setGameState] = useState('idle');
+  const [currentShape, setCurrentShape] = useState(null);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [lives, setLives] = useState(3);
   const [timeLeft, setTimeLeft] = useState(60);
-  const [correctSorts, setCorrectSorts] = useState(0);
-  const [totalAttempts, setTotalAttempts] = useState(0);
+  const [sortedCount, setSortedCount] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [totalShapes, setTotalShapes] = useState(0);
   const [gameStartTime, setGameStartTime] = useState(null);
-  const [draggedShape, setDraggedShape] = useState(null);
-  const [dropZoneActive, setDropZoneActive] = useState(false);
+  const [sortingCriteria, setSortingCriteria] = useState('color');
 
-  const gameAreaRef = useRef(null);
   const { startGameSession, recordGameScore, feedback, clearFeedback } = useGame();
   const { speak, playSound, settings } = useAccessibility();
 
-  // Generate new shapes and target
-  const generateNewRound = useCallback(() => {
-    const { shapes: newShapes, target } = generateShapes(level);
-    setShapes(newShapes);
-    setTargetShape(target);
+  const shapes = ['circle', 'square', 'triangle'];
+  const colors = ['red', 'blue', 'green', 'yellow'];
+  const sizes = ['small', 'medium', 'large'];
+
+  // Generate new shape
+  const generateShape = useCallback(() => {
+    const shape = {
+      type: shapes[Math.floor(Math.random() * shapes.length)],
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: sizes[Math.floor(Math.random() * sizes.length)]
+    };
+    setCurrentShape(shape);
+    setTotalShapes(prev => prev + 1);
     
     if (settings.autoRead) {
-      speak(`Find and drag the ${getShapeDescription(target)} to the target area.`);
+      speak(`Sort this ${shape.size} ${shape.color} ${shape.type} by ${sortingCriteria}.`);
     }
-  }, [level, settings.autoRead, speak]);
+  }, [sortingCriteria, settings.autoRead, speak]);
 
-  // Start game
   const startGame = () => {
     setGameState('instructions');
-    speak('Welcome to Shape Sorter! This game will help you practice visual coordination and shape recognition.');
+    speak('Welcome to Shape Sorter! This game will help you practice categorization.');
   };
 
   const beginGame = () => {
-    const session = startGameSession('shape-sorter');
+    startGameSession('shape-sorter');
     setGameState('playing');
     setScore(0);
     setLevel(1);
     setLives(3);
     setTimeLeft(60);
-    setCorrectSorts(0);
-    setTotalAttempts(0);
+    setSortedCount(0);
+    setCorrectAnswers(0);
+    setTotalShapes(0);
+    setSortingCriteria('color');
     setGameStartTime(Date.now());
-    generateNewRound();
+    generateShape();
     clearFeedback();
     
-    speak('Game starting! Drag the matching shapes to the target area.');
+    speak('Game starting! Sort shapes by their properties.');
     playSound('notification');
   };
 
-  // Handle shape drag start
-  const handleDragStart = (e, shape) => {
-    setDraggedShape(shape);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.target.outerHTML);
-    
-    if (settings.soundEnabled) {
-      playSound('click');
-    }
-    
-    speak(`Dragging ${getShapeDescription(shape)}`);
-  };
+  const handleSort = (category) => {
+    if (!currentShape) return;
 
-  // Handle drag over drop zone
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setDropZoneActive(true);
-  };
-
-  // Handle drag leave drop zone
-  const handleDragLeave = () => {
-    setDropZoneActive(false);
-  };
-
-  // Handle shape drop
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDropZoneActive(false);
-    
-    if (!draggedShape || !targetShape) return;
-
-    const isMatch = checkShapeMatch(draggedShape, targetShape);
-    setTotalAttempts(prev => prev + 1);
-
-    if (isMatch) {
-      const points = calculateScore(level, timeLeft);
-      setScore(prev => prev + points);
-      setCorrectSorts(prev => prev + 1);
-      
-      playSound('success');
-      speak('Correct! Great job!');
-      
-      // Remove the matched shape and generate new round
-      setTimeout(() => {
-        // Level up every 5 correct sorts
-        if ((correctSorts + 1) % 5 === 0) {
-          setLevel(prev => prev + 1);
-          speak(`Level up! Now on level ${level + 1}`);
-        }
-        generateNewRound();
-      }, 1000);
-    } else {
-      setLives(prev => prev - 1);
-      
-      playSound('error');
-      speak(`Not quite right. Look for the ${getShapeDescription(targetShape)}.`);
-      
-      if (lives <= 1) {
-        endGame();
-        return;
-      }
+    let isCorrect = false;
+    switch (sortingCriteria) {
+      case 'color':
+        isCorrect = category === currentShape.color;
+        break;
+      case 'shape':
+        isCorrect = category === currentShape.type;
+        break;
+      case 'size':
+        isCorrect = category === currentShape.size;
+        break;
     }
 
-    setDraggedShape(null);
-  };
-
-  // Handle click/tap for mobile
-  const handleShapeClick = (shape) => {
-    if (!targetShape) return;
-
-    const isMatch = checkShapeMatch(shape, targetShape);
-    setTotalAttempts(prev => prev + 1);
-
-    if (isMatch) {
-      const points = calculateScore(level, timeLeft);
+    if (isCorrect) {
+      const points = level * 10;
       setScore(prev => prev + points);
-      setCorrectSorts(prev => prev + 1);
+      setSortedCount(prev => prev + 1);
+      setCorrectAnswers(prev => prev + 1);
       
       playSound('success');
-      speak('Correct! Great job!');
+      speak('Correct!');
       
-      // Level up every 5 correct sorts
-      if ((correctSorts + 1) % 5 === 0) {
+      // Change criteria every 5 correct sorts
+      if (sortedCount > 0 && sortedCount % 5 === 0) {
+        const criteria = ['color', 'shape', 'size'];
+        const nextCriteria = criteria[(criteria.indexOf(sortingCriteria) + 1) % criteria.length];
+        setSortingCriteria(nextCriteria);
         setLevel(prev => prev + 1);
-        speak(`Level up! Now on level ${level + 1}`);
+        speak(`Level up! Now sort by ${nextCriteria}`);
       }
       
-      setTimeout(() => {
-        generateNewRound();
-      }, 1000);
     } else {
       setLives(prev => prev - 1);
-      
       playSound('error');
-      speak(`Not quite right. Look for the ${getShapeDescription(targetShape)}.`);
+      speak(`Wrong! This should go in ${currentShape[sortingCriteria]}`);
       
       if (lives <= 1) {
-        endGame();
+        setTimeout(() => endGame(), 1000);
         return;
       }
     }
+
+    setTimeout(() => generateShape(), 1000);
   };
 
   // Timer effect
@@ -177,11 +128,10 @@ const ShapeSorter = () => {
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
 
-  // End game
   const endGame = async () => {
     setGameState('finished');
     const timeSpent = (Date.now() - gameStartTime) / 1000;
-    const accuracy = totalAttempts > 0 ? correctSorts / totalAttempts : 0;
+    const accuracy = totalShapes > 0 ? correctAnswers / totalShapes : 0;
 
     try {
       await recordGameScore({
@@ -191,20 +141,20 @@ const ShapeSorter = () => {
         timeSpent,
         difficulty: 'medium',
         metadata: {
-          correctSorts,
-          totalAttempts,
+          totalShapes,
+          correctAnswers,
+          sortedCount,
           livesRemaining: lives
         }
       });
       
       playSound('complete');
-      speak(`Game complete! You scored ${score} points with ${Math.round(accuracy * 100)}% accuracy.`);
+      speak(`Game complete! You sorted ${sortedCount} shapes correctly.`);
     } catch (error) {
       console.error('Error recording score:', error);
     }
   };
 
-  // Pause/Resume game
   const togglePause = () => {
     if (gameState === 'playing') {
       setGameState('paused');
@@ -225,17 +175,17 @@ const ShapeSorter = () => {
       <div className="shape-sorter">
         <div className="game-header">
           <h1>🔷 Shape Sorter</h1>
-          <p>Practice visual coordination and shape recognition!</p>
+          <p>Sort shapes by color, size, and type!</p>
         </div>
         
         <div className="game-intro">
           <div className="intro-content">
             <h2>How to Play</h2>
             <ul>
-              <li>Look at the target shape shown at the top</li>
-              <li>Find the matching shape among the options</li>
-              <li>Drag it to the drop zone or click on it</li>
-              <li>Match shapes by color, size, and type</li>
+              <li>Look at the shape's properties</li>
+              <li>Sort by the current criteria (color, shape, or size)</li>
+              <li>Click the correct category bin</li>
+              <li>Criteria change as you advance levels</li>
             </ul>
             
             <div className="difficulty-info">
@@ -246,12 +196,12 @@ const ShapeSorter = () => {
                   <span>Visual Processing</span>
                 </div>
                 <div className="skill-item">
-                  <span className="skill-icon">🎯</span>
-                  <span>Hand-Eye Coordination</span>
+                  <span className="skill-icon">🧠</span>
+                  <span>Categorization</span>
                 </div>
                 <div className="skill-item">
-                  <span className="skill-icon">🔍</span>
-                  <span>Pattern Matching</span>
+                  <span className="skill-icon">⚡</span>
+                  <span>Quick Decisions</span>
                 </div>
               </div>
             </div>
@@ -275,20 +225,12 @@ const ShapeSorter = () => {
         <div className="instructions-screen">
           <h2>🎯 Get Ready!</h2>
           <div className="instruction-example">
-            <p>When you see this target:</p>
-            <div className="example-target">
-              <div className="example-shape circle red"></div>
+            <p>Sort shapes by their properties:</p>
+            <div className="example-shapes">
+              <div className="shape circle red medium"></div>
+              <div className="shape square blue large"></div>
             </div>
-            <p>Find and select the matching red circle!</p>
-          </div>
-          
-          <div className="control-tips">
-            <h3>Controls:</h3>
-            <ul>
-              <li><strong>Desktop:</strong> Drag shapes to the target area</li>
-              <li><strong>Mobile:</strong> Tap on the matching shape</li>
-              <li><strong>Keyboard:</strong> Use Tab and Enter keys</li>
-            </ul>
+            <p>Click the correct category bin!</p>
           </div>
           
           <div className="ready-controls">
@@ -313,98 +255,84 @@ const ShapeSorter = () => {
   }
 
   if (gameState === 'playing' || gameState === 'paused') {
+    const gameStats = [
+      { icon: '🏆', label: 'Score', value: score },
+      { icon: '📊', label: 'Level', value: level },
+      { icon: '❤️', label: 'Lives', value: lives },
+      { icon: '⏰', label: 'Time', value: `${timeLeft}s` },
+      { icon: '🎯', label: 'Sorted', value: sortedCount }
+    ];
+
+    const getSortingBins = () => {
+      switch (sortingCriteria) {
+        case 'color':
+          return colors.map(color => ({ type: color, label: color.toUpperCase() }));
+        case 'shape':
+          return shapes.map(shape => ({ type: shape, label: shape.toUpperCase() }));
+        case 'size':
+          return sizes.map(size => ({ type: size, label: size.toUpperCase() }));
+        default:
+          return [];
+      }
+    };
+
     return (
       <div className="shape-sorter">
-        <div className="game-header">
-          <div className="game-stats">
-            <div className="stat-item">
-              <span className="stat-label">Score</span>
-              <span className="stat-value">{score}</span>
+        <GameLayout
+          gameTitle="🔷 Shape Sorter"
+          level={level}
+          onPause={togglePause}
+          isPaused={gameState === 'paused'}
+          stats={gameStats}
+        >
+          {currentShape && gameState === 'playing' && (
+            <div className="sorting-container">
+              <div className="sorting-instruction">
+                <h3>Sort by: {sortingCriteria.toUpperCase()}</h3>
+              </div>
+              
+              <div className="shape-display">
+                <div className={`shape ${currentShape.type} ${currentShape.color} ${currentShape.size}`}>
+                </div>
+              </div>
+
+              <div className="sorting-bins">
+                {getSortingBins().map((bin) => (
+                  <button
+                    key={bin.type}
+                    className={`sorting-bin ${bin.type}`}
+                    onClick={() => handleSort(bin.type)}
+                    aria-label={`Sort into ${bin.label} category`}
+                  >
+                    {bin.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Level</span>
-              <span className="stat-value">{level}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Lives</span>
-              <span className="stat-value">{'❤️'.repeat(lives)}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Time</span>
-              <span className="stat-value">{timeLeft}s</span>
-            </div>
-          </div>
-          
-          <button 
-            className="btn-accessible btn-secondary pause-btn"
-            onClick={togglePause}
-            aria-label={gameState === 'paused' ? 'Resume game' : 'Pause game'}
-          >
-            {gameState === 'paused' ? '▶️ Resume' : '⏸️ Pause'}
-          </button>
-        </div>
+          )}
+        </GameLayout>
 
         {gameState === 'paused' && (
           <div className="pause-overlay">
             <div className="pause-message">
               <h2>⏸️ Game Paused</h2>
               <p>Take a break! Click Resume when you're ready.</p>
+              <button 
+                className="btn-accessible btn-primary"
+                onClick={togglePause}
+                aria-label="Resume game"
+              >
+                ▶️ Resume Game
+              </button>
             </div>
           </div>
         )}
-
-        <div className="game-area" ref={gameAreaRef}>
-          {targetShape && gameState === 'playing' && (
-            <>
-              <div className="target-section">
-                <h3>Find this shape:</h3>
-                <div className="target-display">
-                  <div 
-                    className={`shape ${targetShape.type} ${targetShape.color} ${targetShape.size}`}
-                    aria-label={`Target: ${getShapeDescription(targetShape)}`}
-                  ></div>
-                </div>
-              </div>
-
-              <div 
-                className={`drop-zone ${dropZoneActive ? 'active' : ''}`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                aria-label="Drop matching shape here"
-              >
-                <p>Drop Here</p>
-                <span className="drop-icon">🎯</span>
-              </div>
-
-              <div className="shapes-grid">
-                {shapes.map((shape, index) => (
-                  <div
-                    key={index}
-                    className={`shape ${shape.type} ${shape.color} ${shape.size} interactive`}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, shape)}
-                    onClick={() => handleShapeClick(shape)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleShapeClick(shape);
-                      }
-                    }}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`${getShapeDescription(shape)} - Click to select`}
-                  ></div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
       </div>
     );
   }
 
   if (gameState === 'finished') {
-    const accuracy = totalAttempts > 0 ? Math.round((correctSorts / totalAttempts) * 100) : 0;
+    const accuracy = totalShapes > 0 ? Math.round((correctAnswers / totalShapes) * 100) : 0;
     
     return (
       <div className="shape-sorter">
@@ -417,16 +345,16 @@ const ShapeSorter = () => {
               <span className="result-value">{score}</span>
             </div>
             <div className="result-item">
-              <span className="result-label">Accuracy</span>
-              <span className="result-value">{accuracy}%</span>
-            </div>
-            <div className="result-item">
               <span className="result-label">Level Reached</span>
               <span className="result-value">{level}</span>
             </div>
             <div className="result-item">
+              <span className="result-label">Accuracy</span>
+              <span className="result-value">{accuracy}%</span>
+            </div>
+            <div className="result-item">
               <span className="result-label">Shapes Sorted</span>
-              <span className="result-value">{correctSorts}</span>
+              <span className="result-value">{sortedCount}</span>
             </div>
           </div>
 

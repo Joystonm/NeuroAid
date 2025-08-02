@@ -1,0 +1,994 @@
+#!/bin/bash
+
+# Create SequenceSense CSS
+cat > /mnt/c/Users/User/Documents/GitHub/NeuroAid/client/src/games/SequenceSense/SequenceSense_new.css << 'EOF'
+/* SequenceSense Game Styles */
+.sequence-sense {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+.sequence-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.sequence-display h3, .input-area h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.number-sequence {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.sequence-number {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.sequence-number.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: scale(1.2);
+}
+
+.sequence-input {
+  padding: 1rem;
+  font-size: 1.5rem;
+  border: 3px solid #dee2e6;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  width: 200px;
+}
+
+.sequence-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+.input-display {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.submit-btn {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Common styles */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.game-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-intro {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.intro-content h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.intro-content ul {
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.intro-content li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.difficulty-info {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.skill-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.start-btn {
+  font-size: 1.2rem;
+  padding: 16px 32px;
+  margin-top: 2rem;
+}
+
+.instructions-screen {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.instruction-example {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.example-sequence {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.ready-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pause-message {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+}
+
+.game-results {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.result-label {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.result-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.ai-feedback {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .sequence-sense { padding: 0.5rem; }
+  .number-sequence { gap: 0.5rem; }
+  .sequence-number { width: 50px; height: 50px; font-size: 1.5rem; }
+  .results-stats { grid-template-columns: 1fr; }
+  .result-actions { flex-direction: column; align-items: center; }
+}
+EOF
+
+# Create ShapeSorter CSS
+cat > /mnt/c/Users/User/Documents/GitHub/NeuroAid/client/src/games/ShapeSorter/ShapeSorter_new.css << 'EOF'
+/* ShapeSorter Game Styles */
+.shape-sorter {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+.sorting-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.sorting-instruction h3 {
+  color: #333;
+  font-size: 1.5rem;
+  text-align: center;
+  margin: 0;
+}
+
+.shape-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.shape {
+  transition: all 0.3s ease;
+}
+
+.shape.circle {
+  border-radius: 50%;
+}
+
+.shape.square {
+  border-radius: 4px;
+}
+
+.shape.triangle {
+  width: 0;
+  height: 0;
+  background: transparent !important;
+  border-style: solid;
+}
+
+.shape.small {
+  width: 60px;
+  height: 60px;
+}
+
+.shape.medium {
+  width: 80px;
+  height: 80px;
+}
+
+.shape.large {
+  width: 100px;
+  height: 100px;
+}
+
+.shape.red { background: #dc3545; }
+.shape.blue { background: #007bff; }
+.shape.green { background: #28a745; }
+.shape.yellow { background: #ffc107; }
+
+.shape.triangle.red { border-color: transparent transparent #dc3545 transparent; }
+.shape.triangle.blue { border-color: transparent transparent #007bff transparent; }
+.shape.triangle.green { border-color: transparent transparent #28a745 transparent; }
+.shape.triangle.yellow { border-color: transparent transparent #ffc107 transparent; }
+
+.shape.triangle.small { border-width: 0 30px 52px 30px; }
+.shape.triangle.medium { border-width: 0 40px 69px 40px; }
+.shape.triangle.large { border-width: 0 50px 87px 50px; }
+
+.sorting-bins {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.sorting-bin {
+  padding: 1rem;
+  border: 3px solid #dee2e6;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sorting-bin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.sorting-bin.red { border-color: #dc3545; color: #dc3545; }
+.sorting-bin.blue { border-color: #007bff; color: #007bff; }
+.sorting-bin.green { border-color: #28a745; color: #28a745; }
+.sorting-bin.yellow { border-color: #ffc107; color: #ffc107; }
+
+.sorting-bin.circle { border-radius: 50%; }
+.sorting-bin.square { border-radius: 4px; }
+.sorting-bin.triangle { border-radius: 0; }
+
+.example-shapes {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+/* Common styles - same as other games */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.game-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-intro {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.intro-content h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.intro-content ul {
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.intro-content li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.difficulty-info {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.skill-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.start-btn {
+  font-size: 1.2rem;
+  padding: 16px 32px;
+  margin-top: 2rem;
+}
+
+.instructions-screen {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.instruction-example {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.ready-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pause-message {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+}
+
+.game-results {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.result-label {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.result-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.ai-feedback {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .shape-sorter { padding: 0.5rem; }
+  .sorting-bins { grid-template-columns: repeat(2, 1fr); }
+  .results-stats { grid-template-columns: 1fr; }
+  .result-actions { flex-direction: column; align-items: center; }
+}
+EOF
+
+# Create WordChain CSS
+cat > /mnt/c/Users/User/Documents/GitHub/NeuroAid/client/src/games/WordChain/WordChain_new.css << 'EOF'
+/* WordChain Game Styles */
+.word-chain {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+.word-chain-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.word-display {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.word-display h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.current-word {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+  margin: 1rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+}
+
+.word-hint {
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+.word-feedback {
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  animation: fadeIn 0.3s ease-in;
+  margin-bottom: 1rem;
+}
+
+.word-feedback.correct {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.word-feedback.incorrect {
+  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+  color: white;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.word-input {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.word-field {
+  flex: 1;
+  padding: 1rem;
+  font-size: 1.5rem;
+  border: 3px solid #dee2e6;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.word-field:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+.word-field:disabled {
+  background: #f8f9fa;
+  opacity: 0.7;
+}
+
+.submit-btn {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.chain-display {
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.chain-display h4 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.word-chain-list {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chain-item {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.chain-more {
+  padding: 0.5rem 1rem;
+  background: #6c757d;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.example-chain {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.chain-word {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.chain-arrow {
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Common styles - same as other games */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.game-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-intro {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.intro-content h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.intro-content ul {
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.intro-content li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.difficulty-info {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.skill-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.start-btn {
+  font-size: 1.2rem;
+  padding: 16px 32px;
+  margin-top: 2rem;
+}
+
+.instructions-screen {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.instruction-example {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.ready-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pause-message {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+}
+
+.game-results {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.result-label {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.result-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.ai-feedback {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .word-chain { padding: 0.5rem; }
+  .current-word { font-size: 2.5rem; padding: 1rem; }
+  .word-input { flex-direction: column; gap: 1rem; }
+  .word-field { font-size: 1.2rem; }
+  .submit-btn { width: 100%; }
+  .results-stats { grid-template-columns: 1fr; }
+  .result-actions { flex-direction: column; align-items: center; }
+  .example-chain { flex-direction: column; gap: 0.5rem; }
+  .chain-arrow { transform: rotate(90deg); }
+}
+EOF
+
+echo "Created CSS files for remaining games!"

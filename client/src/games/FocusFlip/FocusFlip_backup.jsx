@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { generateCards, shuffleArray, calculateScore } from './logic';
-import GameLayout from '../../components/GameLayout';
 import './FocusFlip.css';
 
 const FocusFlip = () => {
@@ -295,43 +294,40 @@ const FocusFlip = () => {
   }
 
   if (gameState === 'playing' || gameState === 'paused') {
-    const gameStats = [
-      { icon: '🏆', label: 'Score', value: score },
-      { icon: '📊', label: 'Level', value: level },
-      { icon: '❤️', label: 'Lives', value: lives },
-      { icon: '⏰', label: 'Time', value: `${timeLeft}s` },
-      { icon: '🎯', label: 'Moves', value: moves }
-    ];
-
     return (
       <div className="focus-flip">
-        <GameLayout
-          gameTitle="🃏 Focus Flip"
-          level={level}
-          onPause={togglePause}
-          isPaused={gameState === 'paused'}
-          stats={gameStats}
-        >
-          {gameState === 'playing' && (
-            <div className="cards-container">
-              <div className="cards-grid">
-                {cards.map((card, index) => (
-                  <button
-                    key={index}
-                    className={getCardClass(index)}
-                    onClick={() => handleCardClick(index)}
-                    disabled={flippedCards.length >= 2 && !flippedCards.includes(index)}
-                    aria-label={`Card ${index + 1}: ${matchedCards.includes(index) || flippedCards.includes(index) ? card.symbol : 'Hidden'}`}
-                  >
-                    <span className="card-content">
-                      {getCardContent(card, index)}
-                    </span>
-                  </button>
-                ))}
-              </div>
+        <div className="game-header">
+          <div className="game-stats">
+            <div className="stat-item">
+              <span className="stat-label">Score</span>
+              <span className="stat-value">{score}</span>
             </div>
-          )}
-        </GameLayout>
+            <div className="stat-item">
+              <span className="stat-label">Level</span>
+              <span className="stat-value">{level}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Lives</span>
+              <span className="stat-value">{'❤️'.repeat(lives)}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Time</span>
+              <span className="stat-value">{timeLeft}s</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Moves</span>
+              <span className="stat-value">{moves}</span>
+            </div>
+          </div>
+          
+          <button 
+            className="btn-accessible btn-secondary pause-btn"
+            onClick={togglePause}
+            aria-label={gameState === 'paused' ? 'Resume game' : 'Pause game'}
+          >
+            {gameState === 'paused' ? '▶️ Resume' : '⏸️ Pause'}
+          </button>
+        </div>
 
         {gameState === 'paused' && (
           <div className="pause-overlay">
@@ -348,6 +344,26 @@ const FocusFlip = () => {
             </div>
           </div>
         )}
+
+        <div className="game-area">
+          {gameState === 'playing' && (
+            <div className="cards-grid">
+              {cards.map((card, index) => (
+                <button
+                  key={index}
+                  className={getCardClass(index)}
+                  onClick={() => handleCardClick(index)}
+                  disabled={flippedCards.length >= 2 && !flippedCards.includes(index)}
+                  aria-label={`Card ${index + 1}: ${matchedCards.includes(index) || flippedCards.includes(index) ? card.symbol : 'Hidden'}`}
+                >
+                  <span className="card-content">
+                    {getCardContent(card, index)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }

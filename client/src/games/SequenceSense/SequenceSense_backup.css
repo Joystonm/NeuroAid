@@ -1,104 +1,13 @@
-/* FocusFlip Game Styles - Game-specific elements */
+/* SequenceSense Game Styles - Neurodivergent Friendly */
 
-.focus-flip {
-  max-width: 1400px;
+.sequence-sense {
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem 1rem;
   min-height: calc(100vh - 80px);
 }
 
-/* Cards Container */
-.cards-container {
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Cards Grid */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  width: 100%;
-  max-width: 500px;
-}
-
-/* Memory Cards */
-.memory-card {
-  aspect-ratio: 1;
-  min-height: 100px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 3px solid #dee2e6;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: bold;
-  position: relative;
-  overflow: hidden;
-}
-
-.memory-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border-color: #667eea;
-}
-
-.memory-card:focus {
-  outline: none;
-  border-color: #FFD700;
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
-}
-
-.memory-card:active {
-  transform: translateY(-2px);
-}
-
-.memory-card:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* Card States */
-.memory-card.flipped {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-color: #667eea;
-  transform: rotateY(180deg);
-  animation: flipCard 0.6s ease-in-out;
-}
-
-.memory-card.matched {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
-  border-color: #28a745;
-  animation: matchFound 0.8s ease-in-out;
-}
-
-.card-content {
-  display: block;
-  transition: all 0.3s ease;
-}
-
-/* Animations */
-@keyframes flipCard {
-  0% { transform: rotateY(0deg); }
-  50% { transform: rotateY(90deg) scale(1.1); }
-  100% { transform: rotateY(180deg); }
-}
-
-@keyframes matchFound {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-/* Game Header (for idle/instructions states) */
+/* Game Header */
 .game-header {
   display: flex;
   justify-content: space-between;
@@ -117,6 +26,37 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* Game Stats */
+.game-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.pause-btn {
+  min-width: 120px;
 }
 
 /* Game Intro */
@@ -194,7 +134,7 @@
   padding: 3rem;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
   text-align: center;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
@@ -211,24 +151,41 @@
   margin: 2rem 0;
 }
 
-.example-cards {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
+.example-sequence {
+  font-size: 2rem;
+  font-weight: bold;
   margin: 1rem 0;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5rem;
+  color: #333;
 }
 
-.example-card {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.tips {
+  text-align: left;
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #e8f4fd;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  border-left: 4px solid #3498db;
+}
+
+.tips h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.tips li {
+  margin-bottom: 0.5rem;
+  color: #555;
 }
 
 .ready-controls {
@@ -236,6 +193,144 @@
   gap: 1rem;
   justify-content: center;
   margin-top: 2rem;
+}
+
+/* Game Area */
+.game-area {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sequence-display {
+  margin-bottom: 3rem;
+}
+
+.sequence-instruction {
+  font-size: 1.3rem;
+  color: #666;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.sequence-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.sequence-number {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 60px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.sequence-number:hover {
+  transform: scale(1.05);
+}
+
+.sequence-question {
+  background: #f39c12;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 60px;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Answer Section */
+.answer-section {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.input-group {
+  margin-bottom: 2rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.answer-input {
+  width: 100%;
+  max-width: 200px;
+  padding: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 3px solid #ddd;
+  border-radius: 12px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.answer-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.action-buttons .btn-accessible {
+  min-width: 140px;
+}
+
+/* Hint Display */
+.hint-display {
+  background: #fff3cd;
+  border: 2px solid #ffeaa7;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.hint-display h4 {
+  color: #856404;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.hint-display p {
+  color: #856404;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* Pause Overlay */
@@ -258,17 +353,11 @@
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  max-width: 400px;
 }
 
 .pause-message h2 {
   color: #333;
   margin-bottom: 1rem;
-}
-
-.pause-message p {
-  color: #666;
-  margin-bottom: 2rem;
 }
 
 /* Game Results */
@@ -346,19 +435,34 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .focus-flip {
-    padding: 0.5rem;
+  .sequence-sense {
+    padding: 1rem 0.5rem;
   }
   
-  .cards-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .game-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .game-stats {
+    justify-content: center;
+  }
+  
+  .sequence-container {
     gap: 0.5rem;
-    max-width: 350px;
   }
   
-  .memory-card {
-    min-height: 80px;
+  .sequence-number,
+  .sequence-question {
     font-size: 1.5rem;
+    padding: 0.8rem 1rem;
+    min-width: 50px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
   }
   
   .results-stats {
@@ -374,19 +478,25 @@
 @media (max-width: 480px) {
   .game-intro,
   .instructions-screen,
+  .game-area,
   .game-results {
     padding: 2rem 1rem;
   }
   
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 250px;
-    gap: 0.75rem;
+  .sequence-container {
+    flex-direction: column;
+    gap: 0.5rem;
   }
   
-  .memory-card {
-    min-height: 70px;
-    font-size: 1.2rem;
+  .sequence-number,
+  .sequence-question {
+    font-size: 1.3rem;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .answer-input {
+    font-size: 1.3rem;
+    max-width: 150px;
   }
   
   .ready-controls {
@@ -396,7 +506,7 @@
 }
 
 /* High Contrast Mode */
-.high-contrast .focus-flip {
+.high-contrast .sequence-sense {
   background: #000;
   color: #fff;
 }
@@ -404,35 +514,29 @@
 .high-contrast .game-header,
 .high-contrast .game-intro,
 .high-contrast .instructions-screen,
+.high-contrast .game-area,
 .high-contrast .game-results {
   background: #000;
   color: #fff;
   border: 2px solid #fff;
 }
 
-.high-contrast .memory-card {
-  background: #333;
-  color: #fff;
-  border-color: #fff;
-}
-
-.high-contrast .memory-card.flipped {
+.high-contrast .sequence-number {
   background: #fff;
   color: #000;
 }
 
-.high-contrast .memory-card.matched {
-  background: #0f0;
-  color: #000;
+.high-contrast .answer-input {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
 }
 
 /* Reduced Motion */
-.reduced-motion .memory-card,
-.reduced-motion .card-content {
-  transition: none;
+.reduced-motion .sequence-question {
+  animation: none;
 }
 
-.reduced-motion .memory-card.flipped,
-.reduced-motion .memory-card.matched {
-  animation: none;
+.reduced-motion .sequence-number:hover {
+  transform: none;
 }

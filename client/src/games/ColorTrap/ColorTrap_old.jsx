@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { generateColorTrapChallenge, checkAnswer, calculateScore } from './logic';
-import GameLayout from '../../components/GameLayout';
-import './ColorTrap.css';
+import GameLayout from '../../components/GameLayout';import './ColorTrap.css';
 
 const ColorTrap = () => {
   const [gameState, setGameState] = useState('idle'); // idle, instructions, playing, paused, finished
@@ -51,47 +50,49 @@ const ColorTrap = () => {
     generateNewChallenge();
     clearFeedback();
     
-    speak('Game starting! Identify the color of the text, not what the word says.');
+    speak('Game starting! Click the color of the word, not what the word says.');
     playSound('notification');
   };
 
-  // Handle answer
+  // Handle answer selection
   const handleAnswer = (selectedColor) => {
     if (gameState !== 'playing' || !currentChallenge) return;
 
     const isCorrect = checkAnswer(currentChallenge, selectedColor);
     
     if (isCorrect) {
-      const points = calculateScore(level, timeLeft, streak);
+      const points = calculateScore(level, streak, timeLeft);
       setScore(prev => prev + points);
-      setStreak(prev => prev + 1);
       setCorrectAnswers(prev => prev + 1);
+      setStreak(prev => prev + 1);
       
       playSound('success');
       speak('Correct!');
       
-      // Check for level up
-      if (streak > 0 && streak % 5 === 0) {
+      // Level up every 5 correct answers
+      if ((correctAnswers + 1) % 5 === 0) {
         setLevel(prev => prev + 1);
-        setTimeLeft(Math.max(15, 30 - level * 2)); // Decrease time as level increases
-        speak(`Level up! Now level ${level + 1}`);
+        speak(`Level up! Now on level ${level + 1}`);
       }
-      
-      setTimeout(() => generateNewChallenge(), 1000);
     } else {
       setLives(prev => prev - 1);
       setStreak(0);
       
       playSound('error');
-      speak(`Wrong! The color was ${currentChallenge.textColor}`);
+      speak(`Incorrect. The word was ${currentChallenge.textColor} color.`);
       
       if (lives <= 1) {
-        setTimeout(() => endGame(), 1000);
+        endGame();
         return;
       }
-      
-      setTimeout(() => generateNewChallenge(), 1500);
     }
+
+    // Generate next challenge after a brief delay
+    setTimeout(() => {
+      if (gameState === 'playing') {
+        generateNewChallenge();
+      }
+    }, 1000);
   };
 
   // Timer effect
@@ -125,9 +126,9 @@ const ColorTrap = () => {
         timeSpent,
         difficulty: 'medium',
         metadata: {
-          totalQuestions,
           correctAnswers,
-          maxStreak: streak,
+          totalQuestions,
+          streak,
           livesRemaining: lives
         }
       });
@@ -160,17 +161,17 @@ const ColorTrap = () => {
       <div className="color-trap">
         <div className="game-header">
           <h1>🎨 Color Trap</h1>
-          <p>Test your impulse control and attention!</p>
+          <p>Train your impulse control with the Stroop effect!</p>
         </div>
         
         <div className="game-intro">
           <div className="intro-content">
             <h2>How to Play</h2>
             <ul>
-              <li>You'll see color words displayed in different colors</li>
-              <li>Click the color that the TEXT is displayed in</li>
-              <li>Don't get trapped by what the word says!</li>
-              <li>Build streaks for bonus points</li>
+              <li>You'll see words that name colors</li>
+              <li>Click the button that matches the COLOR of the word</li>
+              <li>Don't get trapped by what the word SAYS!</li>
+              <li>Be quick but careful - you have 3 lives</li>
             </ul>
             
             <div className="difficulty-info">
@@ -210,11 +211,10 @@ const ColorTrap = () => {
         <div className="instructions-screen">
           <h2>🎯 Get Ready!</h2>
           <div className="instruction-example">
-            <p>Example: If you see the word "BLUE" in red text:</p>
-            <div className="example-word" style={{ color: 'red', fontSize: '2rem', fontWeight: 'bold' }}>
-              BLUE
-            </div>
-            <p>Click RED (the color of the text), not blue!</p>
+            <p>Example: If you see the word</p>
+            <div className="example-word" style={{ color: 'blue' }}>RED</div>
+            <p>Click the <strong>BLUE</strong> button (the color you see)</p>
+            <p>Not the RED button (what the word says)</p>
           </div>
           
           <div className="ready-controls">
@@ -239,25 +239,53 @@ const ColorTrap = () => {
   }
 
   if (gameState === 'playing' || gameState === 'paused') {
-    const gameStats = [
-      { icon: '🏆', label: 'Score', value: score },
-      { icon: '📊', label: 'Level', value: level },
-      { icon: '❤️', label: 'Lives', value: lives },
-      { icon: '⏰', label: 'Time', value: `${timeLeft}s` },
-      { icon: '🔥', label: 'Streak', value: streak }
-    ];
-
     return (
       <div className="color-trap">
-        <GameLayout
-          gameTitle="🎨 Color Trap"
-          level={level}
-          onPause={togglePause}
-          isPaused={gameState === 'paused'}
-          stats={gameStats}
-        >
+        <div className="game-header">
+          <div className="game-stats">
+            <div className="stat-item">
+              <span className="stat-label">Score</span>
+              <span className="stat-value">{score}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Level</span>
+              <span className="stat-value">{level}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Lives</span>
+              <span className="stat-value">{'❤️'.repeat(lives)}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Time</span>
+              <span className="stat-value">{timeLeft}s</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Streak</span>
+              <span className="stat-value">{streak}</span>
+            </div>
+          </div>
+          
+          <button 
+            className="btn-accessible btn-secondary pause-btn"
+            onClick={togglePause}
+            aria-label={gameState === 'paused' ? 'Resume game' : 'Pause game'}
+          >
+            {gameState === 'paused' ? '▶️ Resume' : '⏸️ Pause'}
+          </button>
+        </div>
+
+        {gameState === 'paused' && (
+          <div className="pause-overlay">
+            <div className="pause-message">
+              <h2>⏸️ Game Paused</h2>
+              <p>Take a break! Click Resume when you're ready.</p>
+            </div>
+          </div>
+        )}
+
+        <div className="game-area">
           {currentChallenge && gameState === 'playing' && (
-            <div className="challenge-container">
+            <>
               <div className="challenge-display">
                 <p className="challenge-instruction">What COLOR is this word?</p>
                 <div 
@@ -282,25 +310,9 @@ const ColorTrap = () => {
                   </button>
                 ))}
               </div>
-            </div>
+            </>
           )}
-        </GameLayout>
-
-        {gameState === 'paused' && (
-          <div className="pause-overlay">
-            <div className="pause-message">
-              <h2>⏸️ Game Paused</h2>
-              <p>Take a break! Click Resume when you're ready.</p>
-              <button 
-                className="btn-accessible btn-primary"
-                onClick={togglePause}
-                aria-label="Resume game"
-              >
-                ▶️ Resume Game
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     );
   }
@@ -319,12 +331,12 @@ const ColorTrap = () => {
               <span className="result-value">{score}</span>
             </div>
             <div className="result-item">
-              <span className="result-label">Level Reached</span>
-              <span className="result-value">{level}</span>
-            </div>
-            <div className="result-item">
               <span className="result-label">Accuracy</span>
               <span className="result-value">{accuracy}%</span>
+            </div>
+            <div className="result-item">
+              <span className="result-label">Level Reached</span>
+              <span className="result-value">{level}</span>
             </div>
             <div className="result-item">
               <span className="result-label">Best Streak</span>

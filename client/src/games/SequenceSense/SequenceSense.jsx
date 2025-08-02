@@ -1,142 +1,167 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
-import { generateSequence, getNextInSequence, validateAnswer, calculateScore } from './logic';
+import GameLayout from '../../components/GameLayout';
 import './SequenceSense.css';
 
 const SequenceSense = () => {
-  const [gameState, setGameState] = useState('idle'); // idle, instructions, playing, paused, finished
-  const [currentSequence, setCurrentSequence] = useState(null);
-  const [userAnswer, setUserAnswer] = useState('');
+  const [gameState, setGameState] = useState('idle'); // idle, instructions, playing, paused, finished, showing, inputting
+  const [currentSequence, setCurrentSequence] = useState([]);
+  const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [lives, setLives] = useState(3);
-  const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [totalQuestions] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [sequenceLength, setSequenceLength] = useState(3);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [totalSequences, setTotalSequences] = useState(0);
   const [gameStartTime, setGameStartTime] = useState(null);
-  const [showHint, setShowHint] = useState(false);
-  const [hintsUsed, setHintsUsed] = useState(0);
+  const [showingIndex, setShowingIndex] = useState(-1);
 
   const { startGameSession, recordGameScore, feedback, clearFeedback } = useGame();
   const { speak, playSound, settings } = useAccessibility();
 
-  // Generate new sequence challenge
-  const generateNewChallenge = useCallback(() => {
-    const sequence = generateSequence(level);
+  // Generate new sequence
+  const generateSequence = useCallback(() => {
+    const sequence = [];
+    for (let i = 0; i < sequenceLength; i++) {
+      sequence.push(Math.floor(Math.random() * 9) + 1);
+    }
     setCurrentSequence(sequence);
-    setUserAnswer('');
-    setShowHint(false);
+    setTotalSequences(prev => prev + 1);
     
     if (settings.autoRead) {
-      const sequenceText = sequence.sequence.join(', ');
-      speak(`Find the next number in this sequence: ${sequenceText}`);
+      speak(`Memorize this ${sequenceLength} digit sequence.`);
     }
-  }, [level, settings.autoRead, speak]);
+  }, [sequenceLength, settings.autoRead, speak]);
 
   // Start game
   const startGame = () => {
     setGameState('instructions');
-    speak('Welcome to Sequence Sense! This game will help you practice pattern recognition and logical thinking.');
+    speak('Welcome to Sequence Sense! This game will help you practice working memory.');
   };
 
   const beginGame = () => {
-    const session = startGameSession('sequence-sense');
+    startGameSession('sequence-sense');
     setGameState('playing');
     setScore(0);
     setLevel(1);
     setLives(3);
-    setCurrentQuestion(1);
+    setTimeLeft(60);
+    setSequenceLength(3);
     setCorrectAnswers(0);
-    setHintsUsed(0);
+    setTotalSequences(0);
+    setUserInput('');
     setGameStartTime(Date.now());
-    generateNewChallenge();
+    generateSequence();
     clearFeedback();
     
-    speak('Game starting! Look for patterns in the number sequences.');
+    speak('Game starting! Watch the number sequence and remember it.');
     playSound('notification');
+    
+    // Start showing sequence
+    setTimeout(() => showSequence(), 1000);
   };
 
-  // Handle answer submission
-  const handleSubmitAnswer = () => {
-    if (gameState !== 'playing' || !currentSequence || !userAnswer.trim()) return;
+  // Show sequence to user
+  const showSequence = async () => {
+    setGameState('showing');
+    setShowingIndex(-1);
+    
+    // Show each number for 1 second
+    for (let i = 0; i < currentSequence.length; i++) {
+      setShowingIndex(i);
+      playSound('notification');
+      
+      if (settings.autoRead) {
+        speak(currentSequence[i].toString());
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    setShowingIndex(-1);
+    setGameState('inputting');
+    speak('Now enter the sequence you saw.');
+  };
 
-    const isCorrect = validateAnswer(currentSequence, parseInt(userAnswer));
+  // Handle input submission
+  const handleSubmit = () => {
+    if (userInput.length !== currentSequence.length) {
+      speak('Please enter all digits of the sequence.');
+      return;
+    }
+
+    const userSequence = userInput.split('').map(Number);
+    const isCorrect = userSequence.every((num, index) => num === currentSequence[index]);
     
     if (isCorrect) {
-      const points = calculateScore(level, showHint, currentQuestion);
+      const points = sequenceLength * 10 * level;
       setScore(prev => prev + points);
       setCorrectAnswers(prev => prev + 1);
       
       playSound('success');
-      speak('Correct! Well done!');
+      speak('Correct! Well done.');
       
-      // Move to next question
-      setTimeout(() => {
-        if (currentQuestion >= totalQuestions) {
-          // Level complete
-          setLevel(prev => prev + 1);
-          setCurrentQuestion(1);
-          speak(`Level ${level} complete! Moving to level ${level + 1}`);
+      // Increase difficulty
+      if (correctAnswers > 0 && correctAnswers % 3 === 0) {
+        if (sequenceLength < 8) {
+          setSequenceLength(prev => prev + 1);
         } else {
-          setCurrentQuestion(prev => prev + 1);
+          setLevel(prev => prev + 1);
+          setSequenceLength(3);
         }
-        generateNewChallenge();
-      }, 1500);
-    } else {
-      setLives(prev => prev - 1);
-      
-      playSound('error');
-      speak(`Incorrect. The answer was ${currentSequence.answer}.`);
-      
-      if (lives <= 1) {
-        endGame();
-        return;
+        speak(`Level up! Now level ${level + 1}`);
       }
       
-      // Show correct answer briefly, then move to next question
-      setTimeout(() => {
-        if (currentQuestion >= totalQuestions) {
-          endGame();
-        } else {
-          setCurrentQuestion(prev => prev + 1);
-          generateNewChallenge();
-        }
-      }, 2000);
+    } else {
+      setLives(prev => prev - 1);
+      playSound('error');
+      speak(`Incorrect. The sequence was ${currentSequence.join(', ')}`);
+      
+      if (lives <= 1) {
+        setTimeout(() => endGame(), 2000);
+        return;
+      }
     }
+
+    // Generate new sequence
+    setTimeout(() => {
+      setUserInput('');
+      generateSequence();
+      setTimeout(() => showSequence(), 1000);
+    }, 2000);
   };
 
-  // Handle hint request
-  const showHintHandler = () => {
-    if (!currentSequence || showHint) return;
-    
-    setShowHint(true);
-    setHintsUsed(prev => prev + 1);
-    playSound('notification');
-    speak(`Hint: ${currentSequence.hint}`);
-  };
-
-  // Handle input change
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    // Only allow numbers and negative sign
-    if (value === '' || /^-?\d+$/.test(value)) {
-      setUserAnswer(value);
-    }
-  };
-
-  // Handle Enter key press
+  // Handle Enter key
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSubmitAnswer();
+      handleSubmit();
     }
   };
+
+  // Timer effect
+  useEffect(() => {
+    let timer;
+    if (gameState === 'inputting' && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            endGame();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [gameState, timeLeft]);
 
   // End game
   const endGame = async () => {
     setGameState('finished');
     const timeSpent = (Date.now() - gameStartTime) / 1000;
-    const accuracy = totalQuestions > 0 ? correctAnswers / (currentQuestion - 1) : 0;
+    const accuracy = totalSequences > 0 ? correctAnswers / totalSequences : 0;
 
     try {
       await recordGameScore({
@@ -146,9 +171,9 @@ const SequenceSense = () => {
         timeSpent,
         difficulty: 'medium',
         metadata: {
+          totalSequences,
           correctAnswers,
-          totalQuestions: currentQuestion - 1,
-          hintsUsed,
+          maxSequenceLength: sequenceLength,
           livesRemaining: lives
         }
       });
@@ -162,11 +187,11 @@ const SequenceSense = () => {
 
   // Pause/Resume game
   const togglePause = () => {
-    if (gameState === 'playing') {
+    if (gameState === 'inputting') {
       setGameState('paused');
       speak('Game paused');
     } else if (gameState === 'paused') {
-      setGameState('playing');
+      setGameState('inputting');
       speak('Game resumed');
     }
   };
@@ -181,33 +206,33 @@ const SequenceSense = () => {
       <div className="sequence-sense">
         <div className="game-header">
           <h1>🔢 Sequence Sense</h1>
-          <p>Discover patterns and predict what comes next!</p>
+          <p>Remember and repeat number sequences!</p>
         </div>
         
         <div className="game-intro">
           <div className="intro-content">
             <h2>How to Play</h2>
             <ul>
-              <li>Look at the sequence of numbers</li>
-              <li>Find the pattern or rule</li>
-              <li>Enter what number comes next</li>
-              <li>Use hints if you get stuck</li>
+              <li>Watch the number sequence carefully</li>
+              <li>Memorize the order of the digits</li>
+              <li>Enter the sequence exactly as shown</li>
+              <li>Sequences get longer as you progress</li>
             </ul>
             
             <div className="difficulty-info">
               <h3>Skills You'll Practice:</h3>
               <div className="skills-grid">
                 <div className="skill-item">
-                  <span className="skill-icon">🧩</span>
-                  <span>Pattern Recognition</span>
+                  <span className="skill-icon">🧠</span>
+                  <span>Working Memory</span>
+                </div>
+                <div className="skill-item">
+                  <span className="skill-icon">🔢</span>
+                  <span>Number Recall</span>
                 </div>
                 <div className="skill-item">
                   <span className="skill-icon">🎯</span>
-                  <span>Logical Thinking</span>
-                </div>
-                <div className="skill-item">
-                  <span className="skill-icon">🧠</span>
-                  <span>Problem Solving</span>
+                  <span>Concentration</span>
                 </div>
               </div>
             </div>
@@ -231,20 +256,13 @@ const SequenceSense = () => {
         <div className="instructions-screen">
           <h2>🎯 Get Ready!</h2>
           <div className="instruction-example">
-            <p>Example sequence:</p>
-            <div className="example-sequence">2, 4, 6, 8, ?</div>
-            <p>Pattern: Add 2 each time</p>
-            <p>Answer: <strong>10</strong></p>
-          </div>
-          
-          <div className="tips">
-            <h3>Tips:</h3>
-            <ul>
-              <li>Look for addition, subtraction, multiplication patterns</li>
-              <li>Sometimes patterns can be more complex</li>
-              <li>Use hints if you need help</li>
-              <li>Take your time to think</li>
-            </ul>
+            <p>You'll see sequences like:</p>
+            <div className="example-sequence">
+              <span className="sequence-number">3</span>
+              <span className="sequence-number">7</span>
+              <span className="sequence-number">1</span>
+            </div>
+            <p>Watch carefully, then type: 371</p>
           </div>
           
           <div className="ready-controls">
@@ -268,116 +286,90 @@ const SequenceSense = () => {
     );
   }
 
-  if (gameState === 'playing' || gameState === 'paused') {
+  if (gameState === 'playing' || gameState === 'paused' || gameState === 'showing' || gameState === 'inputting') {
+    const gameStats = [
+      { icon: '🏆', label: 'Score', value: score },
+      { icon: '📊', label: 'Level', value: level },
+      { icon: '❤️', label: 'Lives', value: lives },
+      { icon: '⏰', label: 'Time', value: `${timeLeft}s` },
+      { icon: '🧠', label: 'Length', value: sequenceLength }
+    ];
+
     return (
       <div className="sequence-sense">
-        <div className="game-header">
-          <div className="game-stats">
-            <div className="stat-item">
-              <span className="stat-label">Score</span>
-              <span className="stat-value">{score}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Level</span>
-              <span className="stat-value">{level}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Lives</span>
-              <span className="stat-value">{'❤️'.repeat(lives)}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Question</span>
-              <span className="stat-value">{currentQuestion}/{totalQuestions}</span>
-            </div>
+        <GameLayout
+          gameTitle="🔢 Sequence Sense"
+          level={level}
+          onPause={togglePause}
+          isPaused={gameState === 'paused'}
+          stats={gameStats}
+        >
+          <div className="sequence-container">
+            {gameState === 'showing' && (
+              <div className="sequence-display">
+                <h3>Memorize this sequence:</h3>
+                <div className="number-sequence">
+                  {currentSequence.map((num, index) => (
+                    <span 
+                      key={index} 
+                      className={`sequence-number ${index === showingIndex ? 'active' : ''}`}
+                    >
+                      {num}
+                    </span>
+                  ))}
+                </div>
+                <p className="sequence-instruction">Watch carefully...</p>
+              </div>
+            )}
+
+            {gameState === 'inputting' && (
+              <div className="input-area">
+                <h3>Enter the sequence:</h3>
+                <div className="input-display">
+                  <input
+                    type="text"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value.replace(/\D/g, '').slice(0, sequenceLength))}
+                    onKeyPress={handleKeyPress}
+                    placeholder={`Enter ${sequenceLength} digits...`}
+                    className="sequence-input"
+                    maxLength={sequenceLength}
+                    autoFocus
+                  />
+                  <button 
+                    className="btn-accessible btn-primary submit-btn"
+                    onClick={handleSubmit}
+                    disabled={userInput.length !== sequenceLength}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          
-          <button 
-            className="btn-accessible btn-secondary pause-btn"
-            onClick={togglePause}
-            aria-label={gameState === 'paused' ? 'Resume game' : 'Pause game'}
-          >
-            {gameState === 'paused' ? '▶️ Resume' : '⏸️ Pause'}
-          </button>
-        </div>
+        </GameLayout>
 
         {gameState === 'paused' && (
           <div className="pause-overlay">
             <div className="pause-message">
               <h2>⏸️ Game Paused</h2>
               <p>Take a break! Click Resume when you're ready.</p>
+              <button 
+                className="btn-accessible btn-primary"
+                onClick={togglePause}
+                aria-label="Resume game"
+              >
+                ▶️ Resume Game
+              </button>
             </div>
           </div>
         )}
-
-        <div className="game-area">
-          {currentSequence && gameState === 'playing' && (
-            <>
-              <div className="sequence-display">
-                <p className="sequence-instruction">What number comes next?</p>
-                <div className="sequence-container">
-                  {currentSequence.sequence.map((num, index) => (
-                    <div key={index} className="sequence-number">
-                      {num}
-                    </div>
-                  ))}
-                  <div className="sequence-question">?</div>
-                </div>
-              </div>
-
-              <div className="answer-section">
-                <div className="input-group">
-                  <label htmlFor="answer-input" className="input-label">
-                    Your Answer:
-                  </label>
-                  <input
-                    id="answer-input"
-                    type="text"
-                    value={userAnswer}
-                    onChange={handleInputChange}
-                    onKeyPress={handleKeyPress}
-                    className="answer-input"
-                    placeholder="Enter a number"
-                    aria-label="Enter your answer for the sequence"
-                    autoFocus
-                  />
-                </div>
-
-                <div className="action-buttons">
-                  <button
-                    className="btn-accessible btn-primary"
-                    onClick={handleSubmitAnswer}
-                    disabled={!userAnswer.trim()}
-                    aria-label="Submit your answer"
-                  >
-                    Submit Answer
-                  </button>
-                  
-                  <button
-                    className="btn-accessible btn-secondary"
-                    onClick={showHintHandler}
-                    disabled={showHint}
-                    aria-label="Get a hint for this sequence"
-                  >
-                    💡 Hint
-                  </button>
-                </div>
-
-                {showHint && (
-                  <div className="hint-display">
-                    <h4>💡 Hint:</h4>
-                    <p>{currentSequence.hint}</p>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
       </div>
     );
   }
 
   if (gameState === 'finished') {
-    const accuracy = currentQuestion > 1 ? Math.round((correctAnswers / (currentQuestion - 1)) * 100) : 0;
+    const accuracy = totalSequences > 0 ? Math.round((correctAnswers / totalSequences) * 100) : 0;
     
     return (
       <div className="sequence-sense">
@@ -390,16 +382,16 @@ const SequenceSense = () => {
               <span className="result-value">{score}</span>
             </div>
             <div className="result-item">
-              <span className="result-label">Accuracy</span>
-              <span className="result-value">{accuracy}%</span>
-            </div>
-            <div className="result-item">
               <span className="result-label">Level Reached</span>
               <span className="result-value">{level}</span>
             </div>
             <div className="result-item">
-              <span className="result-label">Hints Used</span>
-              <span className="result-value">{hintsUsed}</span>
+              <span className="result-label">Accuracy</span>
+              <span className="result-value">{accuracy}%</span>
+            </div>
+            <div className="result-item">
+              <span className="result-label">Max Length</span>
+              <span className="result-value">{sequenceLength}</span>
             </div>
           </div>
 

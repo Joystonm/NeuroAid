@@ -1,43 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useGame } from '../../contexts/GameContext';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
-import { generateStartWord, validateWordConnection, calculateScore, getWordCategories } from './logic';
+import GameLayout from '../../components/GameLayout';
 import './WordChain.css';
 
 const WordChain = () => {
-  const [gameState, setGameState] = useState('idle'); // idle, instructions, playing, paused, finished
+  const [gameState, setGameState] = useState('idle');
   const [currentWord, setCurrentWord] = useState('');
-  const [wordChain, setWordChain] = useState([]);
-  const [userInput, setUserInput] = useState('');
+  const [userWord, setUserWord] = useState('');
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [lives, setLives] = useState(3);
   const [timeLeft, setTimeLeft] = useState(60);
-  const [streak, setStreak] = useState(0);
+  const [chainLength, setChainLength] = useState(0);
+  const [usedWords, setUsedWords] = useState(new Set());
+  const [wordChain, setWordChain] = useState([]);
   const [gameStartTime, setGameStartTime] = useState(null);
-  const [correctWords, setCorrectWords] = useState(0);
-  const [totalAttempts, setTotalAttempts] = useState(0);
-  const [hint, setHint] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
 
-  const { startGameSession, recordGameScore, feedback, clearFeedback } = useGame();
+  const { startGameSession, recordGameScore, feedback: gameFeedback, clearFeedback } = useGame();
   const { speak, playSound, settings } = useAccessibility();
 
-  // Generate new starting word
-  const generateNewWord = useCallback(() => {
-    const startWord = generateStartWord(level);
-    setCurrentWord(startWord);
-    setWordChain([startWord]);
-    setHint('');
-    
-    if (settings.autoRead) {
-      speak(`New word: ${startWord}. Find a word that connects to it!`);
-    }
-  }, [level, settings.autoRead, speak]);
+  const startingWords = ['apple', 'house', 'table', 'music', 'water', 'light', 'paper', 'green'];
 
-  // Start game
   const startGame = () => {
     setGameState('instructions');
-    speak('Welcome to Word Chain! This game will help you practice vocabulary and word associations.');
+    speak('Welcome to Word Chain! This game will help you practice vocabulary and word association.');
   };
 
   const beginGame = () => {
@@ -47,84 +36,107 @@ const WordChain = () => {
     setLevel(1);
     setLives(3);
     setTimeLeft(60);
-    setStreak(0);
-    setCorrectWords(0);
-    setTotalAttempts(0);
+    setChainLength(0);
+    setUsedWords(new Set());
+    setWordChain([]);
+    setUserWord('');
     setGameStartTime(Date.now());
-    generateNewWord();
+    
+    // Start with a random word
+    const startWord = startingWords[Math.floor(Math.random() * startingWords.length)];
+    setCurrentWord(startWord);
+    setWordChain([startWord]);
+    setUsedWords(new Set([startWord.toLowerCase()]));
+    
     clearFeedback();
     
-    speak('Word Chain starting! Create connections between words to build your chain.');
+    speak(`Game starting! The first word is ${startWord}. Enter a word that starts with the last letter.`);
     playSound('notification');
   };
 
-  // Handle word submission
-  const handleSubmitWord = () => {
-    if (gameState !== 'playing' || !userInput.trim()) return;
+  const isValidWord = (word) => {
+    // Basic word validation - in a real game, you'd use a dictionary API
+    return word.length >= 3 && /^[a-zA-Z]+$/.test(word);
+  };
 
-    const inputWord = userInput.trim().toLowerCase();
-    setTotalAttempts(prev => prev + 1);
+  const handleWordSubmit = () => {
+    if (!userWord.trim()) return;
 
-    const validation = validateWordConnection(currentWord, inputWord, wordChain);
-    
-    if (validation.isValid) {
-      const points = calculateScore(level, streak, timeLeft, wordChain.length);
-      setScore(prev => prev + points);
-      setCorrectWords(prev => prev + 1);
-      setStreak(prev => prev + 1);
-      
-      // Add word to chain
-      const newChain = [...wordChain, inputWord];
-      setWordChain(newChain);
-      setCurrentWord(inputWord);
-      setUserInput('');
-      setHint('');
-      
-      playSound('success');
-      speak(`Correct! ${inputWord} connects to ${currentWord}. ${validation.connection}`);
-      
-      // Level up every 10 correct words
-      if ((correctWords + 1) % 10 === 0) {
-        setLevel(prev => prev + 1);
-        speak(`Level up! Now on level ${level + 1}`);
-      }
-    } else {
+    const word = userWord.toLowerCase().trim();
+    const lastLetter = currentWord.slice(-1).toLowerCase();
+    const firstLetter = word.charAt(0);
+
+    // Check if word starts with the correct letter
+    if (firstLetter !== lastLetter) {
       setLives(prev => prev - 1);
-      setStreak(0);
-      
+      setFeedback(`Word must start with "${lastLetter.toUpperCase()}"!`);
+      setShowFeedback(true);
       playSound('error');
-      speak(`${inputWord} doesn't connect well to ${currentWord}. ${validation.reason}`);
+      speak(`Word must start with ${lastLetter}`);
       
       if (lives <= 1) {
-        endGame();
+        setTimeout(() => endGame(), 2000);
         return;
       }
-      
-      setUserInput('');
     }
+    // Check if word was already used
+    else if (usedWords.has(word)) {
+      setLives(prev => prev - 1);
+      setFeedback('Word already used! Try a different word.');
+      setShowFeedback(true);
+      playSound('error');
+      speak('Word already used');
+      
+      if (lives <= 1) {
+        setTimeout(() => endGame(), 2000);
+        return;
+      }
+    }
+    // Check if word is valid
+    else if (!isValidWord(word)) {
+      setLives(prev => prev - 1);
+      setFeedback('Invalid word! Use only letters, minimum 3 characters.');
+      setShowFeedback(true);
+      playSound('error');
+      speak('Invalid word');
+      
+      if (lives <= 1) {
+        setTimeout(() => endGame(), 2000);
+        return;
+      }
+    }
+    // Word is correct!
+    else {
+      const points = word.length * level;
+      setScore(prev => prev + points);
+      setChainLength(prev => prev + 1);
+      setCurrentWord(word);
+      setUsedWords(prev => new Set([...prev, word]));
+      setWordChain(prev => [...prev, word]);
+      
+      setFeedback(`Great! +${points} points`);
+      setShowFeedback(true);
+      playSound('success');
+      speak('Correct!');
+      
+      // Level up every 10 words
+      if (chainLength > 0 && chainLength % 10 === 0) {
+        setLevel(prev => prev + 1);
+        speak(`Level up! Now level ${level + 1}`);
+      }
+    }
+
+    // Clear input and feedback
+    setTimeout(() => {
+      setUserWord('');
+      setShowFeedback(false);
+    }, 1500);
   };
 
-  // Handle Enter key press
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSubmitWord();
+      handleWordSubmit();
     }
-  };
-
-  // Get hint
-  const getHint = () => {
-    const categories = getWordCategories(currentWord);
-    const hintText = `Try words related to: ${categories.join(', ')}`;
-    setHint(hintText);
-    speak(hintText);
-    playSound('notification');
-  };
-
-  // Skip word
-  const skipWord = () => {
-    generateNewWord();
-    setUserInput('');
-    speak('Skipped to a new word');
   };
 
   // Timer effect
@@ -144,11 +156,10 @@ const WordChain = () => {
     return () => clearInterval(timer);
   }, [gameState, timeLeft]);
 
-  // End game
   const endGame = async () => {
     setGameState('finished');
     const timeSpent = (Date.now() - gameStartTime) / 1000;
-    const accuracy = totalAttempts > 0 ? correctWords / totalAttempts : 0;
+    const accuracy = chainLength > 0 ? chainLength / (chainLength + (3 - lives)) : 0;
 
     try {
       await recordGameScore({
@@ -158,22 +169,19 @@ const WordChain = () => {
         timeSpent,
         difficulty: 'medium',
         metadata: {
-          correctWords,
-          totalAttempts,
-          chainLength: wordChain.length,
-          longestStreak: streak,
+          chainLength,
+          wordsUsed: usedWords.size,
           livesRemaining: lives
         }
       });
       
       playSound('complete');
-      speak(`Game complete! You created a word chain of ${wordChain.length} words with ${Math.round(accuracy * 100)}% accuracy.`);
+      speak(`Game complete! You created a chain of ${chainLength} words.`);
     } catch (error) {
       console.error('Error recording score:', error);
     }
   };
 
-  // Pause/Resume game
   const togglePause = () => {
     if (gameState === 'playing') {
       setGameState('paused');
@@ -194,33 +202,33 @@ const WordChain = () => {
       <div className="word-chain">
         <div className="game-header">
           <h1>🔗 Word Chain</h1>
-          <p>Build vocabulary and verbal fluency with word associations!</p>
+          <p>Build word chains and expand your vocabulary!</p>
         </div>
         
         <div className="game-intro">
           <div className="intro-content">
             <h2>How to Play</h2>
             <ul>
-              <li>Connect words by meaning, category, or association</li>
-              <li>Each new word must relate to the previous one</li>
-              <li>Build longer chains for higher scores</li>
-              <li>Use hints if you get stuck</li>
+              <li>Start with the given word</li>
+              <li>Enter a word that starts with the last letter</li>
+              <li>Don't repeat words you've already used</li>
+              <li>Build the longest chain possible</li>
             </ul>
             
             <div className="difficulty-info">
               <h3>Skills You'll Practice:</h3>
               <div className="skills-grid">
                 <div className="skill-item">
-                  <span className="skill-icon">🗣️</span>
-                  <span>Verbal Fluency</span>
-                </div>
-                <div className="skill-item">
                   <span className="skill-icon">📚</span>
                   <span>Vocabulary</span>
                 </div>
                 <div className="skill-item">
-                  <span className="skill-icon">💭</span>
-                  <span>Creative Thinking</span>
+                  <span className="skill-icon">🧠</span>
+                  <span>Word Association</span>
+                </div>
+                <div className="skill-item">
+                  <span className="skill-icon">⚡</span>
+                  <span>Quick Thinking</span>
                 </div>
               </div>
             </div>
@@ -244,27 +252,15 @@ const WordChain = () => {
         <div className="instructions-screen">
           <h2>🎯 Get Ready!</h2>
           <div className="instruction-example">
-            <p>Example word chain:</p>
+            <p>Example chain:</p>
             <div className="example-chain">
-              <span className="chain-word">Cat</span>
+              <span className="chain-word">APPLE</span>
               <span className="chain-arrow">→</span>
-              <span className="chain-word">Pet</span>
+              <span className="chain-word">ELEPHANT</span>
               <span className="chain-arrow">→</span>
-              <span className="chain-word">Dog</span>
-              <span className="chain-arrow">→</span>
-              <span className="chain-word">Bark</span>
+              <span className="chain-word">TABLE</span>
             </div>
-            <p>Each word connects to the next through meaning or association!</p>
-          </div>
-          
-          <div className="tips">
-            <h3>Tips:</h3>
-            <ul>
-              <li>Think of synonyms, categories, or related concepts</li>
-              <li>Use the hint button if you're stuck</li>
-              <li>Skip words that are too difficult</li>
-              <li>Build longer chains for bonus points</li>
-            </ul>
+            <p>Each word starts with the last letter of the previous word!</p>
           </div>
           
           <div className="ready-controls">
@@ -289,40 +285,75 @@ const WordChain = () => {
   }
 
   if (gameState === 'playing' || gameState === 'paused') {
+    const gameStats = [
+      { icon: '🏆', label: 'Score', value: score },
+      { icon: '📊', label: 'Level', value: level },
+      { icon: '❤️', label: 'Lives', value: lives },
+      { icon: '⏰', label: 'Time', value: `${timeLeft}s` },
+      { icon: '🔗', label: 'Chain', value: chainLength }
+    ];
+
     return (
       <div className="word-chain">
-        <div className="game-header">
-          <div className="game-stats">
-            <div className="stat-item">
-              <span className="stat-label">Score</span>
-              <span className="stat-value">{score}</span>
+        <GameLayout
+          gameTitle="🔗 Word Chain"
+          level={level}
+          onPause={togglePause}
+          isPaused={gameState === 'paused'}
+          stats={gameStats}
+        >
+          <div className="word-chain-container">
+            <div className="word-display">
+              <h3>Current Word:</h3>
+              <div className="current-word">
+                {currentWord.toUpperCase()}
+              </div>
+              <p className="word-hint">
+                Next word must start with: <strong>{currentWord.slice(-1).toUpperCase()}</strong>
+              </p>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Level</span>
-              <span className="stat-value">{level}</span>
+            
+            {showFeedback && (
+              <div className={`word-feedback ${feedback.includes('Great') ? 'correct' : 'incorrect'}`}>
+                {feedback}
+              </div>
+            )}
+
+            <div className="word-input">
+              <input
+                type="text"
+                value={userWord}
+                onChange={(e) => setUserWord(e.target.value.replace(/[^a-zA-Z]/g, ''))}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter your word..."
+                className="word-field"
+                autoFocus
+                disabled={showFeedback}
+              />
+              <button 
+                className="btn-accessible btn-primary submit-btn"
+                onClick={handleWordSubmit}
+                disabled={showFeedback || !userWord.trim()}
+              >
+                Submit
+              </button>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Lives</span>
-              <span className="stat-value">{'❤️'.repeat(lives)}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Time</span>
-              <span className="stat-value">{timeLeft}s</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Chain</span>
-              <span className="stat-value">{wordChain.length}</span>
-            </div>
+
+            {wordChain.length > 1 && (
+              <div className="chain-display">
+                <h4>Your Chain:</h4>
+                <div className="word-chain-list">
+                  {wordChain.slice(-5).map((word, index) => (
+                    <span key={index} className="chain-item">
+                      {word.toUpperCase()}
+                    </span>
+                  ))}
+                  {wordChain.length > 5 && <span className="chain-more">...</span>}
+                </div>
+              </div>
+            )}
           </div>
-          
-          <button 
-            className="btn-accessible btn-secondary pause-btn"
-            onClick={togglePause}
-            aria-label={gameState === 'paused' ? 'Resume game' : 'Pause game'}
-          >
-            {gameState === 'paused' ? '▶️ Resume' : '⏸️ Pause'}
-          </button>
-        </div>
+        </GameLayout>
 
         {gameState === 'paused' && (
           <div className="pause-overlay">
@@ -339,119 +370,15 @@ const WordChain = () => {
             </div>
           </div>
         )}
-
-        <div className="game-area">
-          {gameState === 'playing' && (
-            <>
-              {/* Word Chain Display */}
-              <div className="chain-display">
-                <h3>Your Word Chain:</h3>
-                <div className="word-chain-container">
-                  {wordChain.map((word, index) => (
-                    <React.Fragment key={index}>
-                      <span 
-                        className={`chain-word ${index === wordChain.length - 1 ? 'current' : ''}`}
-                      >
-                        {word}
-                      </span>
-                      {index < wordChain.length - 1 && (
-                        <span className="chain-arrow">→</span>
-                      )}
-                    </React.Fragment>
-                  ))}
-                  <span className="chain-arrow">→</span>
-                  <span className="chain-placeholder">?</span>
-                </div>
-              </div>
-
-              {/* Current Word */}
-              <div className="current-word-section">
-                <h3>Connect a word to:</h3>
-                <div className="current-word-display">
-                  {currentWord}
-                </div>
-              </div>
-
-              {/* Input Section */}
-              <div className="input-section">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Enter your word..."
-                    className="word-input"
-                    aria-label="Enter a word that connects to the current word"
-                    autoFocus
-                  />
-                  <button
-                    className="btn-accessible btn-primary submit-btn"
-                    onClick={handleSubmitWord}
-                    disabled={!userInput.trim()}
-                    aria-label="Submit your word"
-                  >
-                    Submit
-                  </button>
-                </div>
-
-                <div className="action-buttons">
-                  <button
-                    className="btn-accessible btn-secondary"
-                    onClick={getHint}
-                    aria-label="Get a hint"
-                  >
-                    💡 Hint
-                  </button>
-                  <button
-                    className="btn-accessible btn-secondary"
-                    onClick={skipWord}
-                    aria-label="Skip to a new word"
-                  >
-                    ⏭️ Skip
-                  </button>
-                </div>
-
-                {hint && (
-                  <div className="hint-display">
-                    <h4>💡 Hint:</h4>
-                    <p>{hint}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Progress Info */}
-              <div className="progress-info">
-                <p>Streak: {streak} | Words: {correctWords} | Accuracy: {totalAttempts > 0 ? Math.round((correctWords / totalAttempts) * 100) : 0}%</p>
-              </div>
-            </>
-          )}
-        </div>
       </div>
     );
   }
 
   if (gameState === 'finished') {
-    const accuracy = totalAttempts > 0 ? Math.round((correctWords / totalAttempts) * 100) : 0;
-    
     return (
       <div className="word-chain">
         <div className="game-results">
-          <h2>🎉 Great Word Chain!</h2>
-          
-          <div className="final-chain">
-            <h3>Your Final Chain:</h3>
-            <div className="word-chain-container">
-              {wordChain.map((word, index) => (
-                <React.Fragment key={index}>
-                  <span className="chain-word final">{word}</span>
-                  {index < wordChain.length - 1 && (
-                    <span className="chain-arrow">→</span>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
+          <h2>🎉 Great Job!</h2>
           
           <div className="results-stats">
             <div className="result-item">
@@ -460,22 +387,22 @@ const WordChain = () => {
             </div>
             <div className="result-item">
               <span className="result-label">Chain Length</span>
-              <span className="result-value">{wordChain.length}</span>
-            </div>
-            <div className="result-item">
-              <span className="result-label">Accuracy</span>
-              <span className="result-value">{accuracy}%</span>
+              <span className="result-value">{chainLength}</span>
             </div>
             <div className="result-item">
               <span className="result-label">Level Reached</span>
               <span className="result-value">{level}</span>
             </div>
+            <div className="result-item">
+              <span className="result-label">Words Used</span>
+              <span className="result-value">{usedWords.size}</span>
+            </div>
           </div>
 
-          {feedback && (
+          {gameFeedback && (
             <div className="ai-feedback">
               <h3>🤖 Your Personal Coach Says:</h3>
-              <p>{feedback.text}</p>
+              <p>{gameFeedback.text}</p>
             </div>
           )}
 
