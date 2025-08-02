@@ -1,0 +1,178 @@
+/* MathMaster Game Styles */
+
+.math-master {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+.game-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #333;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(168, 237, 234, 0.4);
+}
+
+.game-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.game-header p {
+  font-size: 1.3rem;
+  opacity: 0.8;
+}
+
+.game-area {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-intro {
+  text-align: center;
+  max-width: 600px;
+}
+
+.intro-content h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.intro-content ul {
+  text-align: left;
+  margin: 0 auto 2rem auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.intro-content li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.skills-practiced {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.skills-practiced h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.skills-grid {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.skill-tag {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.start-btn {
+  font-size: 1.2rem;
+  padding: 16px 32px;
+  margin-top: 2rem;
+}
+
+.game-board {
+  text-align: center;
+  width: 100%;
+}
+
+.game-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.game-content {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.game-content p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.game-results {
+  text-align: center;
+  max-width: 500px;
+}
+
+.game-results h3 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.ai-feedback {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #333;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.ai-feedback h4 {
+  margin-bottom: 1rem;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .math-master {
+    padding: 1rem 0.5rem;
+  }
+  
+  .game-header {
+    padding: 1.5rem;
+  }
+  
+  .game-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .game-area {
+    padding: 2rem;
+  }
+  
+  .result-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}

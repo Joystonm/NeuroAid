@@ -1,0 +1,542 @@
+/* SequenceSense Game Styles - Neurodivergent Friendly */
+
+.sequence-sense {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+/* Game Header */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.game-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Game Stats */
+.game-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.pause-btn {
+  min-width: 120px;
+}
+
+/* Game Intro */
+.game-intro {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.intro-content h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.intro-content ul {
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.intro-content li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.difficulty-info {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.difficulty-info h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.skill-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.start-btn {
+  font-size: 1.2rem;
+  padding: 16px 32px;
+  margin-top: 2rem;
+}
+
+/* Instructions Screen */
+.instructions-screen {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.instructions-screen h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.instruction-example {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.example-sequence {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5rem;
+  color: #333;
+}
+
+.tips {
+  text-align: left;
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #e8f4fd;
+  border-radius: 12px;
+  border-left: 4px solid #3498db;
+}
+
+.tips h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.tips li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.ready-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* Game Area */
+.game-area {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sequence-display {
+  margin-bottom: 3rem;
+}
+
+.sequence-instruction {
+  font-size: 1.3rem;
+  color: #666;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.sequence-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.sequence-number {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 60px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.sequence-number:hover {
+  transform: scale(1.05);
+}
+
+.sequence-question {
+  background: #f39c12;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 60px;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Answer Section */
+.answer-section {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.input-group {
+  margin-bottom: 2rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.answer-input {
+  width: 100%;
+  max-width: 200px;
+  padding: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 3px solid #ddd;
+  border-radius: 12px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.answer-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.action-buttons .btn-accessible {
+  min-width: 140px;
+}
+
+/* Hint Display */
+.hint-display {
+  background: #fff3cd;
+  border: 2px solid #ffeaa7;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.hint-display h4 {
+  color: #856404;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.hint-display p {
+  color: #856404;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Pause Overlay */
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pause-message {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.pause-message h2 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* Game Results */
+.game-results {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.game-results h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.result-label {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.result-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* AI Feedback */
+.ai-feedback {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.ai-feedback h3 {
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.ai-feedback p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sequence-sense {
+    padding: 1rem 0.5rem;
+  }
+  
+  .game-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .game-stats {
+    justify-content: center;
+  }
+  
+  .sequence-container {
+    gap: 0.5rem;
+  }
+  
+  .sequence-number,
+  .sequence-question {
+    font-size: 1.5rem;
+    padding: 0.8rem 1rem;
+    min-width: 50px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .results-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .result-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-intro,
+  .instructions-screen,
+  .game-area,
+  .game-results {
+    padding: 2rem 1rem;
+  }
+  
+  .sequence-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .sequence-number,
+  .sequence-question {
+    font-size: 1.3rem;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .answer-input {
+    font-size: 1.3rem;
+    max-width: 150px;
+  }
+  
+  .ready-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* High Contrast Mode */
+.high-contrast .sequence-sense {
+  background: #000;
+  color: #fff;
+}
+
+.high-contrast .game-header,
+.high-contrast .game-intro,
+.high-contrast .instructions-screen,
+.high-contrast .game-area,
+.high-contrast .game-results {
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.high-contrast .sequence-number {
+  background: #fff;
+  color: #000;
+}
+
+.high-contrast .answer-input {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
+}
+
+/* Reduced Motion */
+.reduced-motion .sequence-question {
+  animation: none;
+}
+
+.reduced-motion .sequence-number:hover {
+  transform: none;
+}

@@ -1,0 +1,495 @@
+/* Games Page Styles - Modern Compact Design */
+
+.games {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  min-height: calc(100vh - 80px);
+  background: #f8fafc;
+}
+
+/* Games Header */
+.games-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
+}
+
+.games-header h1 {
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.games-header p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.games-stats {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-number {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Games Grid */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+/* Game Cards */
+.game-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  height: fit-content;
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: rgba(102, 126, 234, 0.1);
+}
+
+.game-card:hover::before {
+  opacity: 1;
+}
+
+/* Game Card Header */
+.game-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.game-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.game-badges {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.difficulty-badge {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Game Info */
+.game-info {
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+.game-info h3 {
+  font-size: 1.375rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.game-description {
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.game-category {
+  margin-bottom: 0.75rem;
+}
+
+.category-badge {
+  color: white;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+}
+
+/* Play Button */
+.play-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+  width: 100%;
+  margin-top: auto;
+}
+
+.play-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+
+.play-button:active {
+  transform: translateY(0);
+}
+
+.play-icon {
+  font-size: 1rem;
+}
+
+/* Games Footer */
+.games-footer {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-top: 1rem;
+}
+
+.training-tips h3 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.training-tips ul {
+  list-style: none;
+  padding: 0;
+  max-width: 700px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.training-tips li {
+  background: #f8fafc;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border-left: 3px solid #667eea;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  color: #374151;
+}
+
+.training-tips li:hover {
+  background: #f1f5f9;
+  transform: translateX(3px);
+}
+
+.training-tips strong {
+  color: #667eea;
+  font-weight: 700;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .games-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .games {
+    padding: 1rem 0.75rem;
+  }
+  
+  .games-header {
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .games-header h1 {
+    font-size: 1.875rem;
+  }
+  
+  .games-header p {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .games-stats {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .stat-badge {
+    padding: 0.625rem 1rem;
+    flex: 1;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .games-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .game-card {
+    padding: 1rem;
+  }
+  
+  .game-icon {
+    font-size: 2rem;
+  }
+  
+  .game-info h3 {
+    font-size: 1.25rem;
+  }
+  
+  .game-description {
+    font-size: 0.85rem;
+  }
+  
+  .games-footer {
+    padding: 1.5rem;
+  }
+  
+  .training-tips h3 {
+    font-size: 1.25rem;
+  }
+  
+  .training-tips li {
+    padding: 0.875rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .games {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .games-header {
+    padding: 1rem;
+  }
+  
+  .games-header h1 {
+    font-size: 1.625rem;
+  }
+  
+  .games-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .stat-badge {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .stat-number {
+    font-size: 1.375rem;
+  }
+  
+  .game-card {
+    padding: 0.875rem;
+  }
+  
+  .game-card-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .game-badges {
+    margin-top: 0;
+  }
+  
+  .game-icon {
+    font-size: 1.875rem;
+  }
+  
+  .game-info h3 {
+    font-size: 1.125rem;
+    text-align: center;
+  }
+  
+  .game-description {
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .game-category {
+    text-align: center;
+  }
+  
+  .play-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.85rem;
+  }
+  
+  .games-footer {
+    padding: 1.25rem;
+  }
+  
+  .training-tips ul {
+    gap: 0.75rem;
+  }
+  
+  .training-tips li {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* High Contrast Mode */
+.high-contrast .games {
+  background: #000;
+  color: #fff;
+}
+
+.high-contrast .games-header {
+  background: #000;
+  border: 2px solid #fff;
+}
+
+.high-contrast .game-card,
+.high-contrast .games-footer {
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.high-contrast .training-tips li {
+  background: #333;
+  color: #fff;
+  border-left-color: #fff;
+}
+
+.high-contrast .game-info h3,
+.high-contrast .training-tips h3 {
+  color: #fff;
+}
+
+.high-contrast .game-description {
+  color: #ccc;
+}
+
+/* Reduced Motion */
+.reduced-motion .game-card,
+.reduced-motion .play-button,
+.reduced-motion .training-tips li {
+  transition: none;
+}
+
+.reduced-motion .game-card:hover,
+.reduced-motion .play-button:hover,
+.reduced-motion .training-tips li:hover {
+  transform: none;
+}
+
+/* Focus States for Accessibility */
+.game-card:focus-within {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.play-button:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .games {
+    background: white;
+  }
+  
+  .games-header {
+    background: white;
+    color: black;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .game-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+  
+  .play-button {
+    display: none;
+  }
+}

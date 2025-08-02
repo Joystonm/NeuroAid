@@ -1,0 +1,42 @@
+{
+  "name": "neuroaid",
+  "version": "1.0.0",
+  "description": "NeuroAid - Cognitive Training Platform with AI-powered feedback",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install-deps": "npm install && cd client && npm install && cd ../server && npm install",
+    "start": "cd server && node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cognitive-training",
+    "brain-games",
+    "neuroscience",
+    "ai",
+    "react",
+    "nodejs",
+    "mongodb",
+    "grok"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/neuroaid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/neuroaid/issues"
+  },
+  "homepage": "https://github.com/yourusername/neuroaid#readme"
+}
