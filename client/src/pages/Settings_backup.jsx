@@ -13,7 +13,11 @@ const Settings = () => {
     playSound('click');
     
     // Provide audio feedback for important settings
-    if (key === 'soundEnabled') {
+    if (key === 'speechEnabled') {
+      if (value) {
+        setTimeout(() => speak('Text to speech is now enabled'), 100);
+      }
+    } else if (key === 'soundEnabled') {
       if (value) {
         setTimeout(() => playSound('success'), 100);
       }
@@ -165,6 +169,38 @@ const Settings = () => {
                       type="checkbox"
                       checked={settings.soundEnabled}
                       onChange={(e) => handleSettingChange('soundEnabled', e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <label htmlFor="speech-enabled">Text-to-Speech</label>
+                    <p>Read instructions and feedback aloud</p>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      id="speech-enabled"
+                      type="checkbox"
+                      checked={settings.speechEnabled}
+                      onChange={(e) => handleSettingChange('speechEnabled', e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <label htmlFor="auto-read">Auto-Read Instructions</label>
+                    <p>Automatically read game instructions</p>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      id="auto-read"
+                      type="checkbox"
+                      checked={settings.autoRead}
+                      onChange={(e) => handleSettingChange('autoRead', e.target.checked)}
                     />
                     <span className="toggle-slider"></span>
                   </label>

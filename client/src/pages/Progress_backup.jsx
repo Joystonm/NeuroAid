@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 import { useAccessibility } from '../contexts/AccessibilityContext';
-import PerformanceChart from '../components/PerformanceChart';
 import './Progress.css';
 
 const Progress = () => {
@@ -113,10 +112,8 @@ const Progress = () => {
         insights.push({
           type: 'strength',
           title: 'Your Strongest Skill',
-          description: `Excellent performance in ${gameInfo.name} with ${bestGame.accuracy}% accuracy! Keep building on this strength.`,
-          icon: gameInfo.icon,
-          metric: `${bestGame.accuracy}%`,
-          trend: 'up'
+          description: `You excel at ${gameInfo.name} with ${bestGame.accuracy}% accuracy!`,
+          icon: gameInfo.icon
         });
       }
     }
@@ -125,46 +122,27 @@ const Progress = () => {
     if (gameScores.length > 1) {
       const needsWork = gameScores[gameScores.length - 1];
       const gameInfo = gameTypes.find(g => g.id === needsWork.game);
-      if (gameInfo && needsWork.accuracy < 75) {
+      if (gameInfo && needsWork.accuracy < 70) {
         insights.push({
           type: 'improvement',
           title: 'Growth Opportunity',
-          description: `Focus on ${gameInfo.name} to boost your ${needsWork.accuracy}% accuracy. Small improvements make big differences!`,
-          icon: gameInfo.icon,
-          metric: `${needsWork.accuracy}%`,
-          trend: 'target'
+          description: `Practice ${gameInfo.name} more to improve your ${needsWork.accuracy}% accuracy.`,
+          icon: gameInfo.icon
         });
       }
     }
 
     // Overall progress insight
     if (stats.totalGames >= 5) {
-      const avgAccuracy = Math.round(stats.averageAccuracy);
-      let progressMessage = '';
-      let progressIcon = '📊';
-      
-      if (avgAccuracy >= 85) {
-        progressMessage = `Outstanding overall performance! You've mastered ${stats.totalGames} games with ${avgAccuracy}% accuracy.`;
-        progressIcon = '🏆';
-      } else if (avgAccuracy >= 70) {
-        progressMessage = `Great progress across ${stats.totalGames} games! Your ${avgAccuracy}% accuracy shows consistent improvement.`;
-        progressIcon = '📈';
-      } else {
-        progressMessage = `You're building momentum with ${stats.totalGames} games played. Keep practicing to improve your ${avgAccuracy}% accuracy!`;
-        progressIcon = '💪';
-      }
-      
       insights.push({
         type: 'progress',
         title: 'Overall Progress',
-        description: progressMessage,
-        icon: progressIcon,
-        metric: `${stats.totalGames} games`,
-        trend: 'steady'
+        description: `You've played ${stats.totalGames} games with an average accuracy of ${stats.averageAccuracy}%!`,
+        icon: '📊'
       });
     }
 
-    return insights.slice(0, 3); // Limit to 3 insights for better layout
+    return insights;
   };
 
   if (!stats) {
@@ -265,12 +243,27 @@ const Progress = () => {
         <h2>{getProgressMessage(selectedGameStats)}</h2>
       </div>
 
-      {/* Performance Chart */}
-      <PerformanceChart 
-        stats={stats}
-        selectedGame={selectedGame}
-        selectedTimeframe={selectedTimeframe}
-      />
+      {/* Chart Placeholder */}
+      <div className="chart-section">
+        <h3>Performance Over Time</h3>
+        <div className="chart-container">
+          <div className="chart-placeholder">
+            <div className="chart-bars">
+              {[...Array(7)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className="chart-bar" 
+                  style={{ 
+                    height: `${Math.random() * 80 + 20}%`,
+                    animationDelay: `${i * 0.1}s`
+                  }}
+                ></div>
+              ))}
+            </div>
+            <p>Interactive charts coming soon!</p>
+          </div>
+        </div>
+      </div>
 
       {/* Skill Insights */}
       {skillInsights.length > 0 && (
@@ -283,11 +276,6 @@ const Progress = () => {
                 <div className="insight-content">
                   <h4>{insight.title}</h4>
                   <p>{insight.description}</p>
-                  {insight.metric && (
-                    <div className="insight-metric">
-                      <span className="metric-value">{insight.metric}</span>
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
