@@ -5,17 +5,8 @@ NeuroAid is a comprehensive cognitive training platform that combines engaging b
 ## 🧠 Features
 
 - **Interactive Brain Games**: Multiple cognitive training games targeting different mental skills
-- **AI-Powered Feedback**: Personalized insights and recommendations using Grok LLM
 - **Progress Tracking**: Detailed analytics and performance monitoring
 - **Adaptive Difficulty**: Games adjust to user skill level
-- **Journal Integration**: Reflection tools with AI-powered summaries
-
-## 🎮 Available Games
-
-- **Focus Flip**: Memory and attention training through card matching
-- **Dot Dash**: Pattern recognition with morse code sequences
-- **Number Sequence**: Working memory challenges
-- **Color Match**: Processing speed training
 
 ## 🛠 Tech Stack
 
